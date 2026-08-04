@@ -1,4 +1,3 @@
-609596 bytes written to file /Users/michaelbarber/beat-claude-engineer-004/Michael-Barber-BeatClaude-Engineer-004.pdf
-[51544:5001414:0803/233309.251279:ERROR:content/browser/gpu/gpu_process_host.cc:1089] GPU process exited unexpectedly: exit_code=15
-[51544:5001414:0803/233309.253015:ERROR:content/browser/network_service_instance_impl.cc:721] Network service crashed or was terminated, restarting service.
-wrote /Users/michaelbarber/beat-claude-engineer-004/Michael-Barber-BeatClaude-Engineer-004.pdf
+609652 bytes written to file /Users/michaelbarber/beat-claude-engineer-004/Michael-Barber-BeatClaude-Engineer-004.pdf
+[52254:5005112:0803/233412.063128:ERROR:content/browser/gpu/gpu_process_host.cc:1089] GPU process exited unexpectedly: exit_code=15
+[52254:5005112:0803/233412.064710:ERROR:content/browser/network_service_instance_impl.cc:721] Network service crashed or was terminated, restarting service.
