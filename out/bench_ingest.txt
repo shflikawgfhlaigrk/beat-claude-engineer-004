@@ -1,0 +1,12 @@
+run 1: 100000 events in 0.882s -> 113,329 events/sec/core (verdicts=100000)
+run 2: 100000 events in 0.892s -> 112,067 events/sec/core (verdicts=100000)
+run 3: 100000 events in 0.936s -> 106,843 events/sec/core (verdicts=100000)
+
+[Benchmarked] median 112,067 events/sec/core on Darwin arm64 / Python 3.9.6
+[Benchmarked] normalize_line p50=7.4us p95=10.1us p99=28.4us
+[Observed]    brief average load  = 579 events/sec
+[Estimated]   cores to hold average = 0.01
+[Estimated]   cores to hold 10x spike = 0.05
+
+Caveat: measured on one laptop core in CPython, cold OS page cache, no network, no serialization to the stream. Treat as a floor for CPU cost of the transform only, not as end-to-end pipeline throughput.
+wrote out/bench_ingest.json

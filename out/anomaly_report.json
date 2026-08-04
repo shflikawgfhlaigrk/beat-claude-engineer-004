@@ -1,0 +1,434 @@
+{
+  "anomaly_counts": {
+    "client_computed_aggregate": 1,
+    "duplicate_event_id": 1,
+    "implausible_future_timestamp": 1,
+    "malformed_json": 1,
+    "missing_tenant": 1,
+    "negative_transit_latency": 3,
+    "non_human_burst": 4,
+    "privacy_request": 1,
+    "schema_drift": 1,
+    "unclassified_pii_in_properties": 1
+  },
+  "cross_event": {
+    "bot_share_by_tenant": {
+      "t-017": {
+        "bot_flagged": 0,
+        "bot_share_pct": 0.0,
+        "events": 7
+      },
+      "t-042": {
+        "bot_flagged": 4,
+        "bot_share_pct": 36.4,
+        "events": 11
+      },
+      "t-088": {
+        "bot_flagged": 0,
+        "bot_share_pct": 0.0,
+        "events": 4
+      }
+    },
+    "client_aggregate_vs_server_truth": [
+      {
+        "claimed": {
+          "count_today": 3
+        },
+        "event_id": "evt-0019",
+        "server_observable_event_ids": [
+          "evt-0001"
+        ],
+        "server_observable_pricing_views_in_sample": 1
+      }
+    ],
+    "deletion_cascade": [
+      {
+        "matched_by_user_id": [
+          "evt-0017"
+        ],
+        "matched_in_quarantine": [],
+        "matched_only_by_anonymous_id": [
+          "evt-0006"
+        ],
+        "regulation": "GDPR",
+        "request_event": "evt-0017",
+        "subject_anonymous_id": "anon-77a",
+        "subject_user_id": "u-1077",
+        "tenant_id": "t-088"
+      }
+    ],
+    "identity_without_identify_event": [
+      {
+        "anonymous_id": "anon-52d",
+        "event_ids": [
+          "evt-0016",
+          "evt-0024"
+        ],
+        "tenant_id": "t-017",
+        "user_id": "u-8842"
+      },
+      {
+        "anonymous_id": "anon-77a",
+        "event_ids": [
+          "evt-0017"
+        ],
+        "tenant_id": "t-088",
+        "user_id": "u-1077"
+      }
+    ],
+    "retroactive_identity_stitch": [
+      {
+        "anomaly": "retroactive_identity_stitch",
+        "anonymous_id": "anon-c81",
+        "backfill_events": [
+          "evt-0004",
+          "evt-0005"
+        ],
+        "identify_event": "evt-0008",
+        "tenant_id": "t-017",
+        "user_id": "u-2209"
+      },
+      {
+        "anomaly": "retroactive_identity_stitch",
+        "anonymous_id": "anon-3d0",
+        "backfill_events": [
+          "evt-0007"
+        ],
+        "identify_event": "evt-0022",
+        "tenant_id": "t-042",
+        "user_id": "u-7304"
+      },
+      {
+        "anomaly": "retroactive_identity_stitch",
+        "anonymous_id": "anon-9f2",
+        "backfill_events": [
+          "evt-0001",
+          "evt-0002"
+        ],
+        "identify_event": "evt-0003",
+        "tenant_id": "t-042",
+        "user_id": "u-5511"
+      }
+    ]
+  },
+  "fixture": "event_sample.jsonl",
+  "fixture_sha256": "1aeb24b415009e89fcf8acb5a178410faf216dc17b16920d9849ecc8bbb24235",
+  "lines_read": 25,
+  "verdict_counts": {
+    "accept": 11,
+    "accept_flagged": 11,
+    "duplicate": 1,
+    "quarantine": 2
+  },
+  "verdicts": [
+    {
+      "anomalies": [],
+      "detail": {
+        "transit_latency_s": 0.206
+      },
+      "event_id": "evt-0001",
+      "line_no": 1,
+      "tenant_id": "t-042",
+      "verdict": "accept"
+    },
+    {
+      "anomalies": [],
+      "detail": {
+        "transit_latency_s": 0.132
+      },
+      "event_id": "evt-0002",
+      "line_no": 2,
+      "tenant_id": "t-042",
+      "verdict": "accept"
+    },
+    {
+      "anomalies": [],
+      "detail": {
+        "transit_latency_s": 0.151
+      },
+      "event_id": "evt-0003",
+      "line_no": 3,
+      "tenant_id": "t-042",
+      "verdict": "accept"
+    },
+    {
+      "anomalies": [],
+      "detail": {
+        "transit_latency_s": 0.179
+      },
+      "event_id": "evt-0004",
+      "line_no": 4,
+      "tenant_id": "t-017",
+      "verdict": "accept"
+    },
+    {
+      "anomalies": [
+        "duplicate_event_id"
+      ],
+      "detail": {
+        "duplicate_of_line": 2,
+        "transit_latency_s": 7.56
+      },
+      "event_id": "evt-0002",
+      "line_no": 5,
+      "tenant_id": "t-042",
+      "verdict": "duplicate"
+    },
+    {
+      "anomalies": [
+        "negative_transit_latency"
+      ],
+      "detail": {
+        "clock": "event ts is 47.2s ahead of server receipt",
+        "transit_latency_s": -47.19
+      },
+      "event_id": "evt-0005",
+      "line_no": 6,
+      "tenant_id": "t-017",
+      "verdict": "accept_flagged"
+    },
+    {
+      "anomalies": [
+        "negative_transit_latency"
+      ],
+      "detail": {
+        "clock": "event ts is 3900.0s ahead of server receipt",
+        "transit_latency_s": -3900.0
+      },
+      "event_id": "evt-0006",
+      "line_no": 7,
+      "tenant_id": "t-088",
+      "verdict": "accept_flagged"
+    },
+    {
+      "anomalies": [
+        "unclassified_pii_in_properties"
+      ],
+      "detail": {
+        "pii_fields": [
+          "contact_email",
+          "phone"
+        ],
+        "transit_latency_s": 0.179
+      },
+      "event_id": "evt-0007",
+      "line_no": 8,
+      "tenant_id": "t-042",
+      "verdict": "accept_flagged"
+    },
+    {
+      "anomalies": [],
+      "detail": {
+        "transit_latency_s": 0.166
+      },
+      "event_id": "evt-0008",
+      "line_no": 9,
+      "tenant_id": "t-017",
+      "verdict": "accept"
+    },
+    {
+      "anomalies": [
+        "schema_drift"
+      ],
+      "detail": {
+        "schema_drift": [
+          "properties.page_path->path",
+          "properties.ref->referrer",
+          "received_at:absent",
+          "timestamp->ts",
+          "type:pageview->page_view"
+        ]
+      },
+      "event_id": "evt-0009",
+      "line_no": 10,
+      "tenant_id": "t-042",
+      "verdict": "accept_flagged"
+    },
+    {
+      "anomalies": [],
+      "detail": {
+        "transit_latency_s": 0.189
+      },
+      "event_id": "evt-0010",
+      "line_no": 11,
+      "tenant_id": "t-088",
+      "verdict": "accept"
+    },
+    {
+      "anomalies": [
+        "missing_tenant"
+      ],
+      "detail": {
+        "tenant": "null tenant_id: unroutable, cannot be billed, stored, or deleted per-tenant",
+        "transit_latency_s": 0.162
+      },
+      "event_id": "evt-0011",
+      "line_no": 12,
+      "raw": "{\"event_id\":\"evt-0011\",\"tenant_id\":null,\"anonymous_id\":\"anon-b19\",\"user_id\":null,\"type\":\"page_view\",\"ts\":\"2026-06-15T14:09:12.740Z\",\"received_at\":\"2026-06-15T14:09:12.902Z\",\"properties\":{\"path\":\"/blog/launch\"}}",
+      "tenant_id": null,
+      "verdict": "quarantine"
+    },
+    {
+      "anomalies": [
+        "non_human_burst"
+      ],
+      "detail": {
+        "bot_signal": "4 page_views from one visitor within 1.0s",
+        "transit_latency_s": 0.119
+      },
+      "event_id": "evt-0012",
+      "line_no": 13,
+      "tenant_id": "t-042",
+      "verdict": "accept_flagged"
+    },
+    {
+      "anomalies": [
+        "non_human_burst"
+      ],
+      "detail": {
+        "bot_signal": "4 page_views from one visitor within 1.0s",
+        "transit_latency_s": 0.123
+      },
+      "event_id": "evt-0013",
+      "line_no": 14,
+      "tenant_id": "t-042",
+      "verdict": "accept_flagged"
+    },
+    {
+      "anomalies": [
+        "non_human_burst"
+      ],
+      "detail": {
+        "bot_signal": "4 page_views from one visitor within 1.0s",
+        "transit_latency_s": 0.129
+      },
+      "event_id": "evt-0014",
+      "line_no": 15,
+      "tenant_id": "t-042",
+      "verdict": "accept_flagged"
+    },
+    {
+      "anomalies": [
+        "non_human_burst"
+      ],
+      "detail": {
+        "bot_signal": "4 page_views from one visitor within 1.0s",
+        "transit_latency_s": 0.133
+      },
+      "event_id": "evt-0015",
+      "line_no": 16,
+      "tenant_id": "t-042",
+      "verdict": "accept_flagged"
+    },
+    {
+      "anomalies": [
+        "implausible_future_timestamp",
+        "negative_transit_latency"
+      ],
+      "detail": {
+        "clock": "event ts is 31535999.8s ahead of server receipt",
+        "transit_latency_s": -31535999.788
+      },
+      "event_id": "evt-0016",
+      "line_no": 17,
+      "tenant_id": "t-017",
+      "verdict": "accept_flagged"
+    },
+    {
+      "anomalies": [
+        "privacy_request"
+      ],
+      "detail": {
+        "privacy_request": {
+          "regulation": "GDPR",
+          "request": "delete_all_data",
+          "subject_anonymous_id": "anon-77a",
+          "subject_user_id": "u-1077"
+        },
+        "transit_latency_s": 0.191
+      },
+      "event_id": "evt-0017",
+      "line_no": 18,
+      "tenant_id": "t-088",
+      "verdict": "accept_flagged"
+    },
+    {
+      "anomalies": [],
+      "detail": {
+        "transit_latency_s": 0.157
+      },
+      "event_id": "evt-0018",
+      "line_no": 19,
+      "tenant_id": "t-017",
+      "verdict": "accept"
+    },
+    {
+      "anomalies": [
+        "client_computed_aggregate"
+      ],
+      "detail": {
+        "client_aggregates": [
+          "count_today"
+        ],
+        "transit_latency_s": 0.193
+      },
+      "event_id": "evt-0019",
+      "line_no": 20,
+      "tenant_id": "t-042",
+      "verdict": "accept_flagged"
+    },
+    {
+      "anomalies": [
+        "malformed_json"
+      ],
+      "detail": {
+        "parse_error": "Expecting ',' delimiter at col 227"
+      },
+      "event_id": "evt-0020",
+      "line_no": 21,
+      "raw": "{\"event_id\":\"evt-0020\",\"tenant_id\":\"t-088\",\"anonymous_id\":\"anon-e42\",\"user_id\":null,\"type\":\"click\",\"ts\":\"2026-06-15T14:15:33.472Z\",\"received_at\":\"2026-06-15T14:15:33.655Z\",\"properties\":{\"selector\":\"#signup\",\"path\":\"/features\"}",
+      "tenant_id": "t-088",
+      "verdict": "quarantine"
+    },
+    {
+      "anomalies": [],
+      "detail": {
+        "transit_latency_s": 0.162
+      },
+      "event_id": "evt-0021",
+      "line_no": 22,
+      "tenant_id": "t-017",
+      "verdict": "accept"
+    },
+    {
+      "anomalies": [],
+      "detail": {
+        "transit_latency_s": 0.182
+      },
+      "event_id": "evt-0022",
+      "line_no": 23,
+      "tenant_id": "t-042",
+      "verdict": "accept"
+    },
+    {
+      "anomalies": [],
+      "detail": {
+        "transit_latency_s": 0.163
+      },
+      "event_id": "evt-0023",
+      "line_no": 24,
+      "tenant_id": "t-088",
+      "verdict": "accept"
+    },
+    {
+      "anomalies": [],
+      "detail": {
+        "transit_latency_s": 0.165
+      },
+      "event_id": "evt-0024",
+      "line_no": 25,
+      "tenant_id": "t-017",
+      "verdict": "accept"
+    }
+  ]
+}

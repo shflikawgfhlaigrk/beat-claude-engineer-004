@@ -1,0 +1,32 @@
+test_claimed_count_contradicts_server_observation (test_normalize.TestClientAggregatesAreNeverTrusted) ... ok
+test_delete_request_reaches_pre_identity_events (test_normalize.TestDeletionCascade)
+The seeded GDPR request names u-1077, but the subject's other event ... ok
+test_checksum_pins_the_round (test_normalize.TestFixtureIntegrity)
+Fixtures rotate between hiring rounds. If this fails, every event_id ... ok
+test_repeated_event_id_becomes_duplicate_not_second_event (test_normalize.TestIdempotency) ... ok
+test_same_event_id_across_tenants_is_not_deduped (test_normalize.TestIdempotency)
+event_id uniqueness is only guaranteed within a tenant. ... ok
+test_same_shape_different_id_is_not_deduped (test_normalize.TestIdempotency)
+Two genuine rapid clicks must survive. Dedupe is keyed on the SDK's ... ok
+test_identity_can_arrive_with_no_identify_event_in_window (test_normalize.TestIdentityStitching)
+anon-52d and anon-77a carry user_ids with no identify event in the ... ok
+test_pre_identify_events_are_listed_for_backfill (test_normalize.TestIdentityStitching) ... ok
+test_every_line_produces_exactly_one_verdict (test_normalize.TestNoSilentLoss) ... ok
+test_malformed_line_is_quarantined_with_raw_bytes_retained (test_normalize.TestNoSilentLoss) ... ok
+test_quarantine_rows_stay_addressable_for_gdpr (test_normalize.TestNoSilentLoss) ... ok
+test_custom_event_name_is_not_a_person (test_normalize.TestPiiPrecision)
+Regression: an earlier hint list matched the key `name` and flagged ... ok
+test_real_contact_details_are_caught (test_normalize.TestPiiPrecision) ... ok
+test_bot_burst (test_normalize.TestSeededAnomalies) ... ok
+test_client_computed_aggregate (test_normalize.TestSeededAnomalies) ... ok
+test_clock_skew_and_future_timestamps (test_normalize.TestSeededAnomalies) ... ok
+test_malformed_json (test_normalize.TestSeededAnomalies) ... ok
+test_missing_tenant (test_normalize.TestSeededAnomalies) ... ok
+test_pii_in_payload (test_normalize.TestSeededAnomalies) ... ok
+test_schema_drift (test_normalize.TestSeededAnomalies) ... ok
+
+----------------------------------------------------------------------
+Ran 20 tests in 0.004s
+
+OK
+tests exit=0

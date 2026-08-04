@@ -1,0 +1,38 @@
+events/month      : 1,500,000,000  (0.0 day(s) at 10x)
+events/sec average: 578.7   at 10x spike: 5,787.0
+raw volume        : 11.5 GB/day
+
+COMPONENT                        CHOICE                                          USD/MONTH
+------------------------------------------------------------------------------------------
+Collector (ECS Fargate)          6 tasks x 1 vCPU / 2 GB                               216
+                                 [Estimated] sized for 10x spike held continuously, not autoscaled into it
+ALB                              2.3 LCU                                                14
+                                 [Estimated] new-connection-bound; existing listener reused, no SDK change
+Kinesis Data Streams             7 shards provisioned, 7d retention, 3 EFO cons        459
+                                 [Estimated] shard count from 10x spike / 900 rec/s; 7d retention is the replay budget
+Stream consumers (Lambda)        9M invocations, 250ms @ 1 GB                           39
+                                 [Assumed] 250ms/batch dominated by downstream writes, not CPU
+ElastiCache Redis                6 x r7g.large (dedupe set + hot counters)             880
+                                 [Estimated] 24h event_id dedupe set + segment counters; disposable state
+DynamoDB (visitor profiles)      150M WRU / 450M RRU on-demand                         362
+                                 [Assumed] 10% of events change durable state; 60% trigger a decision read
+ClickHouse (self-managed)        3 x m7g.2xlarge + 2 TB gp3 each                     1,195
+                                 [Estimated] MVP alternative is ClickHouse Cloud at roughly 2-3x this, buying back the ops hours of 2 engineers - see ANSWER.md trade-offs
+S3 + Iceberg lake                228 GB compressed, hourly per-tenant partition          9
+                                 [Estimated] 11.5 GB/day raw at 9:1 compression
+Athena (export + reconciliation) [Assumed] 60 TB scanned/month                         300
+                                 [Assumed] daily per-tenant export + hourly old-vs-new reconciliation queries
+NAT + inter-AZ transfer          [Assumed] 3 TB/month                                  135
+                                 [Assumed] cross-AZ replication and egress to customer warehouses
+CloudWatch (sampled)             [Assumed] 400 GB/month logs + metrics                 200
+                                 [Estimated] per-event logging would be ~5.7 TB/mo (~$2,850); logs are sampled at 1% with quarantine rows logged at 100%
+Contingency                      30% of modelled subtotal                            1,143
+                                 [Assumed] unmodelled: KMS, Secrets Manager, ECR, WAF, backups, dev/stage envs
+------------------------------------------------------------------------------------------
+TOTAL [Estimated]                                                                    4,952
+CEILING [Observed, brief]                                                           50,000
+HEADROOM                                                                            45,048
+
+=> 9.9% of the stated ceiling. The budget is not the binding constraint; the two engineers are.
+
+wrote out/cost_model.json

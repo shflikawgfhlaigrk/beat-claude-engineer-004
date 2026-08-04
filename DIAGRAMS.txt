@@ -1,0 +1,110 @@
+A. DATA FLOW - SDK TO DASHBOARD  (nothing on this path may change for the customer)
+
+  [ JS SDK ]  unchanged - constraint
+      | HTTPS batch POST, same host + path as today
+      v
+  +-- EDGE ----------------------------------------------------------------+
+  |  ALB (existing listener)  ->  Collector (ECS Fargate)                   |
+  |                               authn | tenant resolve | per-tenant quota |
+  |                               200 returned ONLY after durable PUT ack   |
+  |                                    |            \                       |
+  |                                    |             `-> disk spill + SQS   |
+  +------------------------------------|--------------------|--------------+
+                                       |                    |
+                     +--------> ACCEPT LEDGER               |  (PUT failure)
+                     |     event_id + tenant + minute       |
+                     |     = reconciliation ground truth    |
+                     |                                      v
+                     |               +-- Kinesis Data Streams -------------+
+                     |               |  7 shards | 7-day retention         |
+                     |               |  key = tenant_id:anonymous_id       |
+                     |               +----------------|--------------------+
+                     |                                v
+                     |          +-- INGEST-EDGE CONTRACT (normalize.py) ---+
+                     |          |  alias translate | PII detect | clock    |
+                     |          |  bot flag | idempotency on event_id      |
+                     |          +--+------+------+------+------------------+
+                     |             |      |      |      |
+                     |             v      v      v      v
+                     |    QUARANTINE  ClickHouse  Redis  DynamoDB   S3+Iceberg
+                     |    raw bytes   dashboards  dedupe  profile   tenant/hour
+                     |    kept, still  segments   set +   point     row-level
+                     |    deletable               counters read     deletes
+                     |         |          |         |       |            |
+                     |         |          v         v       v            v
+                     +---------|----- count      Personalization    per-tenant
+                     reconcile |     reconciliation  decision API   export to
+                               |                                    Snowflake /
+                               `--> replay to Kinesis after fix      BigQuery
+
+
+B. VERDICT MACHINE - one line in, exactly one verdict out (no fifth outcome)
+
+    raw line
+       |
+       +-- parses as JSON object? --no--> QUARANTINE  malformed_json
+       |                                  raw bytes kept, ids regex-scraped
+       yes                                                      [evt-0020]
+       |
+       +-- alias translation: timestamp->ts, page_path->path,
+       |   ref->referrer, pageview->page_view                    [evt-0009]
+       |
+       +-- tenant_id present? --no--> QUARANTINE  missing_tenant
+       |                              unroutable / unbillable / undeletable
+       yes                                                       [evt-0011]
+       |
+       +-- (tenant, event_id) in 24h dedupe set? --yes--> DUPLICATE
+       |                                          counted, not stored
+       no                                                        [evt-0002]
+       |
+       +-- flag: clock skew [evt-0005, evt-0006] | future ts [evt-0016]
+       |         PII [evt-0007] | bot burst [evt-0012..0015]
+       |         client aggregate [evt-0019] | privacy request [evt-0017]
+       |
+       +-- any flag? --yes--> ACCEPT_FLAGGED   flags are query-time filters,
+       |                                       never deletions
+       no
+       |
+       `--> ACCEPT
+
+
+C. MIGRATION - parallel run, per-tenant gate, automatic rollback
+
+    SDK (unchanged) -> Collector --+--> EXISTING PIPELINE (authoritative) --> current store
+                                   |                                              |
+                                   `--> NEW PIPELINE (shadow) --> ClickHouse ------+
+                                                                                  |
+                                                                                  v
+                                              HOURLY RECONCILER: count by tenant/hour,
+                                              unique visitors, conversions, 10k sampled ids
+                                                                                  |
+                          PASS: |delta| <= 0.1% for 14 days AND 100% of sampled ids in both
+                                   |                                              |
+                                   v                                              v
+                          flip READ flag for that tenant                  tenant holds on old
+                                   |                                      store, defect gets
+                                   v                                      a named owner
+                          AUTO-ROLLBACK WATCH
+                          divergence > 0.5% / 15 min
+                          OR p99 e2e > 10s / 10 min
+                          OR quarantine rate > 0.5%
+                                   |
+                                   `--> flag reverts, on-call paged.
+                                        Rollback is a read-path flag flip,
+                                        not a data movement - which is the
+                                        only reason it can be automatic.
+
+
+D. GDPR DELETION BLAST RADIUS  [evt-0017: delete_all_data, GDPR, t-088, u-1077]
+
+    1. resolve subject keys: u-1077 + EVERY anonymous_id ever stitched to it
+       -> catches evt-0006, which carries user_id: null and is reachable
+          only through anon-77a. Deleting by user_id alone leaves it behind.
+    2. destroy per-subject data key (crypto-shred: PII unreadable in every
+       copy, including backups, without rewriting them)
+    3. Iceberg row-level delete by subject key
+    4. delete DynamoDB profile + Redis counters
+    5. SWEEP THE QUARANTINE TABLE - the second place deletion jobs forget.
+       evt-0011-class rows have no tenant_id at all.
+    6. emit tombstone to Kinesis so warehouse exports replay the delete
+    7. HUMAN sign-off before the destructive step; signed completion record

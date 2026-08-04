@@ -1,0 +1,75 @@
+fixture         : event_sample.jsonl
+sha256          : 1aeb24b415009e89fcf8acb5a178410faf216dc17b16920d9849ecc8bbb24235
+lines read      : 25
+verdicts        : accept=11, accept_flagged=11, duplicate=1, quarantine=2
+
+ANOMALY CLASSES
+  client_computed_aggregate        n=1  evt-0019
+  duplicate_event_id               n=1  evt-0002
+  implausible_future_timestamp     n=1  evt-0016
+  malformed_json                   n=1  evt-0020
+  missing_tenant                   n=1  evt-0011
+  negative_transit_latency         n=3  evt-0005, evt-0006, evt-0016
+  non_human_burst                  n=4  evt-0012, evt-0013, evt-0014, evt-0015
+  privacy_request                  n=1  evt-0017
+  schema_drift                     n=1  evt-0009
+  unclassified_pii_in_properties   n=1  evt-0007
+
+PER-LINE VERDICTS
+  line  5  evt-0002        duplicate  duplicate_event_id
+           transit_latency_s: 7.56
+           duplicate_of_line: 2
+  line  6  evt-0005        accept_flagged negative_transit_latency
+           transit_latency_s: -47.19
+           clock: event ts is 47.2s ahead of server receipt
+  line  7  evt-0006        accept_flagged negative_transit_latency
+           transit_latency_s: -3900.0
+           clock: event ts is 3900.0s ahead of server receipt
+  line  8  evt-0007        accept_flagged unclassified_pii_in_properties
+           transit_latency_s: 0.179
+           pii_fields: ['contact_email', 'phone']
+  line 10  evt-0009        accept_flagged schema_drift
+           schema_drift: ['properties.page_path->path', 'properties.ref->referrer', 'received_at:absent', 'timestamp->ts', 'type:pageview->page_view']
+  line 12  evt-0011        quarantine missing_tenant
+           tenant: null tenant_id: unroutable, cannot be billed, stored, or deleted per-tenant
+           transit_latency_s: 0.162
+  line 13  evt-0012        accept_flagged non_human_burst
+           transit_latency_s: 0.119
+           bot_signal: 4 page_views from one visitor within 1.0s
+  line 14  evt-0013        accept_flagged non_human_burst
+           transit_latency_s: 0.123
+           bot_signal: 4 page_views from one visitor within 1.0s
+  line 15  evt-0014        accept_flagged non_human_burst
+           transit_latency_s: 0.129
+           bot_signal: 4 page_views from one visitor within 1.0s
+  line 16  evt-0015        accept_flagged non_human_burst
+           transit_latency_s: 0.133
+           bot_signal: 4 page_views from one visitor within 1.0s
+  line 17  evt-0016        accept_flagged implausible_future_timestamp,negative_transit_latency
+           transit_latency_s: -31535999.788
+           clock: event ts is 31535999.8s ahead of server receipt
+  line 18  evt-0017        accept_flagged privacy_request
+           transit_latency_s: 0.191
+           privacy_request: {'request': 'delete_all_data', 'regulation': 'GDPR', 'subject_user_id': 'u-1077', 'subject_anonymous_id': 'anon-77a'}
+  line 20  evt-0019        accept_flagged client_computed_aggregate
+           transit_latency_s: 0.193
+           client_aggregates: ['count_today']
+  line 21  evt-0020        quarantine malformed_json
+           parse_error: Expecting ',' delimiter at col 227
+
+CROSS-EVENT FINDINGS
+  stitch  anon-c81 -> u-2209 via evt-0008: backfill evt-0004, evt-0005
+  stitch  anon-3d0 -> u-7304 via evt-0022: backfill evt-0007
+  stitch  anon-9f2 -> u-5511 via evt-0003: backfill evt-0001, evt-0002
+  no-identify  anon-52d carries u-8842 on evt-0016, evt-0024 (identity arrived outside this window)
+  no-identify  anon-77a carries u-1077 on evt-0017 (identity arrived outside this window)
+  delete  evt-0017 (GDPR, tenant t-088): by user_id evt-0017 | ONLY by anonymous_id evt-0006 | in quarantine -
+  aggregate  evt-0019 claims {'count_today': 3} ; server can observe 1 /pricing view(s) ['evt-0001']
+  bot-share  tenant t-017: 0/7 events flagged non-human (0.0%)
+  bot-share  tenant t-042: 4/11 events flagged non-human (36.4%)
+  bot-share  tenant t-088: 0/4 events flagged non-human (0.0%)
+
+n=25 lines. These are counts from one synthetic sample, not rates. Nothing here is extrapolated to 50M/day.
+
+wrote out/anomaly_report.json
+detect exit=1

@@ -1,0 +1,86 @@
+{
+  "spike_days": 0.0,
+  "events_month": 1500000000,
+  "events_per_sec_avg": 578.7,
+  "events_per_sec_at_10x": 5787.0,
+  "raw_gb_per_day": 11.5,
+  "items": [
+    {
+      "component": "Collector (ECS Fargate)",
+      "choice": "6 tasks x 1 vCPU / 2 GB",
+      "usd_month": 216.24,
+      "note": "[Estimated] sized for 10x spike held continuously, not autoscaled into it"
+    },
+    {
+      "component": "ALB",
+      "choice": "2.3 LCU",
+      "usd_month": 13.52,
+      "note": "[Estimated] new-connection-bound; existing listener reused, no SDK change"
+    },
+    {
+      "component": "Kinesis Data Streams",
+      "choice": "7 shards provisioned, 7d retention, 3 EFO consumers",
+      "usd_month": 458.58,
+      "note": "[Estimated] shard count from 10x spike / 900 rec/s; 7d retention is the replay budget"
+    },
+    {
+      "component": "Stream consumers (Lambda)",
+      "choice": "9M invocations, 250ms @ 1 GB",
+      "usd_month": 39.3,
+      "note": "[Assumed] 250ms/batch dominated by downstream writes, not CPU"
+    },
+    {
+      "component": "ElastiCache Redis",
+      "choice": "6 x r7g.large (dedupe set + hot counters)",
+      "usd_month": 880.38,
+      "note": "[Estimated] 24h event_id dedupe set + segment counters; disposable state"
+    },
+    {
+      "component": "DynamoDB (visitor profiles)",
+      "choice": "150M WRU / 450M RRU on-demand",
+      "usd_month": 362.5,
+      "note": "[Assumed] 10% of events change durable state; 60% trigger a decision read"
+    },
+    {
+      "component": "ClickHouse (self-managed)",
+      "choice": "3 x m7g.2xlarge + 2 TB gp3 each",
+      "usd_month": 1194.82,
+      "note": "[Estimated] MVP alternative is ClickHouse Cloud at roughly 2-3x this, buying back the ops hours of 2 engineers - see ANSWER.md trade-offs"
+    },
+    {
+      "component": "S3 + Iceberg lake",
+      "choice": "228 GB compressed, hourly per-tenant partitions",
+      "usd_month": 8.84,
+      "note": "[Estimated] 11.5 GB/day raw at 9:1 compression"
+    },
+    {
+      "component": "Athena (export + reconciliation)",
+      "choice": "[Assumed] 60 TB scanned/month",
+      "usd_month": 300.0,
+      "note": "[Assumed] daily per-tenant export + hourly old-vs-new reconciliation queries"
+    },
+    {
+      "component": "NAT + inter-AZ transfer",
+      "choice": "[Assumed] 3 TB/month",
+      "usd_month": 135.0,
+      "note": "[Assumed] cross-AZ replication and egress to customer warehouses"
+    },
+    {
+      "component": "CloudWatch (sampled)",
+      "choice": "[Assumed] 400 GB/month logs + metrics",
+      "usd_month": 200.0,
+      "note": "[Estimated] per-event logging would be ~5.7 TB/mo (~$2,850); logs are sampled at 1% with quarantine rows logged at 100%"
+    },
+    {
+      "component": "Contingency",
+      "choice": "30% of modelled subtotal",
+      "usd_month": 1142.75,
+      "note": "[Assumed] unmodelled: KMS, Secrets Manager, ECR, WAF, backups, dev/stage envs"
+    }
+  ],
+  "subtotal_usd_month": 3809.18,
+  "total_usd_month": 4951.93,
+  "ceiling_usd_month": 50000,
+  "headroom_usd_month": 45048.07,
+  "pct_of_ceiling": 9.9
+}

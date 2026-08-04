@@ -1,0 +1,22 @@
+{
+  "python": "3.9.6",
+  "platform": "Darwin arm64",
+  "events_per_run": 100000,
+  "batch_size": 500,
+  "runs_events_per_sec": [
+    113329,
+    112067,
+    106843
+  ],
+  "median_events_per_sec_per_core": 112067,
+  "normalize_line_latency_us": {
+    "p50": 7.4,
+    "p95": 10.1,
+    "p99": 28.4,
+    "n": 20000
+  },
+  "brief_avg_events_per_sec": 578.7,
+  "brief_spike_events_per_sec": 5787.0,
+  "cores_for_avg": 0.005,
+  "cores_for_10x_spike": 0.052
+}
