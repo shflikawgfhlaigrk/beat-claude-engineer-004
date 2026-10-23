@@ -1,0 +1,15 @@
+name: Black Label source integrity
+on:
+  pull_request:
+  merge_group:
+  push:
+    branches: ["main"]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: blacklabel-integrity-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  source-integrity:
+    uses: black-label-tec/.github/.github/workflows/source-integrity.yml@99d71a80b50718287316b11160225658790324a5
